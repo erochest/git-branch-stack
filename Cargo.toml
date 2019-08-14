@@ -7,3 +7,14 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+clap = "2.33.0"
+git2 = "0.9.2"
+
+[dev-dependencies]
+# assert_cmd = "0.11.1"
+# assert_fs = "0.11.3"
+# dir-diff = "0.3.1"
+# duct = "0.12.0"
+# rexpect = "0.3.0"
+spectral = "0.6.0"
+# tempfile = "3.1.0"
