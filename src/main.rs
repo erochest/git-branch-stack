@@ -16,7 +16,7 @@ fn parse_args() -> Result<Action> {
         .about("Maintain a stack of branches for easy navigation.")
         .subcommand(
             SubCommand::with_name("push")
-                .about("Pushos a new branch onto tho stack.")
+                .about("Pushes a new branch onto tho stack.")
                 .arg(
                     Arg::with_name("branch")
                         .help("The name of the branch to switch to.")
@@ -24,10 +24,13 @@ fn parse_args() -> Result<Action> {
                         .takes_value(true),
                 ),
         )
+        .subcommand(SubCommand::with_name("list").about("List the branches in the branch stack."))
         .get_matches();
 
     if let Some(push_args) = arg_matches.subcommand_matches("push") {
         parse_push_args(push_args)
+    } else if arg_matches.subcommand_matches("list").is_some() {
+        Ok(Action::List)
     } else {
         Err(BranchStackError::InvalidCommandError)
     }

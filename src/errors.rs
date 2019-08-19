@@ -1,6 +1,7 @@
+use std::convert::From;
 use std::error;
 use std::fmt;
-use std::convert::From;
+use std::io;
 use std::result;
 
 use git2;
@@ -11,6 +12,8 @@ pub enum BranchStackError {
     ArgError(String),
     GitError(git2::Error),
     InvalidBranchName(String),
+    NoCurrrentBranch,
+    IoError(io::Error),
 }
 
 pub type Result<R> = result::Result<R, BranchStackError>;
@@ -24,6 +27,8 @@ impl fmt::Display for BranchStackError {
             ArgError(ref arg_name) => write!(f, "invalid argument value: {}", arg_name),
             GitError(ref err) => err.fmt(f),
             InvalidBranchName(ref name) => write!(f, "invalid branch name: {}", name),
+            NoCurrrentBranch => write!(f, "no current branch"),
+            IoError(ref err) => err.fmt(f),
         }
     }
 }
@@ -35,6 +40,8 @@ impl error::Error for BranchStackError {
             ArgError(_) => "invalid argument value",
             GitError(ref err) => err.description(),
             InvalidBranchName(_) => "invalid branch name",
+            NoCurrrentBranch => "no current branch",
+            IoError(ref err) => err.description(),
         }
     }
 }
@@ -42,5 +49,11 @@ impl error::Error for BranchStackError {
 impl From<git2::Error> for BranchStackError {
     fn from(err: git2::Error) -> Self {
         GitError(err)
+    }
+}
+
+impl From<io::Error> for BranchStackError {
+    fn from(err: io::Error) -> Self {
+        IoError(err)
     }
 }
