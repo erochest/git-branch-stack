@@ -1,7 +1,6 @@
-use git2::build::CheckoutBuilder;
-use git2::{BranchType, Repository};
+use git2::Repository;
 
-use crate::errors::{BranchStackError, Result};
+use crate::errors::Result;
 use crate::git::{change_branch, get_current_branch_name};
 use crate::stack::FileStack;
 

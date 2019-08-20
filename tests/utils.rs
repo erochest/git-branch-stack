@@ -68,7 +68,7 @@ pub fn checkout_new_branch<'a>(repo: &Repository, commit: &Commit<'a>, branch_na
     repo.checkout_head(Some(&mut checkout)).unwrap();
 }
 
-pub fn status<P: AsRef<Path>>(path: P, message: Option<&str>) {
+pub fn _status<P: AsRef<Path>>(path: P, message: Option<&str>) {
     message.into_iter().for_each(|m| println!("XXX {}", m));
     Command::new("ls")
         .current_dir(path.as_ref())

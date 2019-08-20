@@ -258,5 +258,4 @@ Trillian
             .collect::<Vec<&String>>(),
         );
     }
-
 }
