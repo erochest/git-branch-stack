@@ -25,12 +25,18 @@ fn parse_args() -> Result<Action> {
                 ),
         )
         .subcommand(SubCommand::with_name("list").about("List the branches in the branch stack."))
+        .subcommand(
+            SubCommand::with_name("pop")
+                .about("Remove the top of the stack and change to the next one down."),
+        )
         .get_matches();
 
     if let Some(push_args) = arg_matches.subcommand_matches("push") {
         parse_push_args(push_args)
     } else if arg_matches.subcommand_matches("list").is_some() {
         Ok(Action::List)
+    } else if arg_matches.subcommand_matches("pop").is_some() {
+        Ok(Action::Pop)
     } else {
         Err(BranchStackError::InvalidCommandError)
     }

@@ -14,6 +14,7 @@ pub enum BranchStackError {
     InvalidBranchName(String),
     NoCurrrentBranch,
     IoError(io::Error),
+    EmptyStack,
 }
 
 pub type Result<R> = result::Result<R, BranchStackError>;
@@ -29,6 +30,7 @@ impl fmt::Display for BranchStackError {
             InvalidBranchName(ref name) => write!(f, "invalid branch name: {}", name),
             NoCurrrentBranch => write!(f, "no current branch"),
             IoError(ref err) => err.fmt(f),
+            EmptyStack => write!(f, "empty stack"),
         }
     }
 }
@@ -42,6 +44,7 @@ impl error::Error for BranchStackError {
             InvalidBranchName(_) => "invalid branch name",
             NoCurrrentBranch => "no current branch",
             IoError(ref err) => err.description(),
+            EmptyStack => "empty stack",
         }
     }
 }

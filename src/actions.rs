@@ -5,9 +5,11 @@ use crate::stack::FileStack;
 pub enum Action {
     Push(String),
     List,
+    Pop,
 }
 
 pub mod list;
+pub mod pop;
 pub mod push;
 
 use Action::*;
@@ -20,5 +22,6 @@ pub fn invoke_action(action: Action) -> Result<()> {
     match action {
         Push(ref branch_name) => push::push_branch(&repo, &mut stack, branch_name),
         List => list::list_branch_stack(&repo, &stack),
+        Pop => pop::pop_branch_stack(&repo, &mut stack),
     }
 }
