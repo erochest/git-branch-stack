@@ -4,7 +4,7 @@ use std::path::Path;
 use std::process::Command;
 
 use git2::build::CheckoutBuilder;
-use git2::{Commit, Error, Repository};
+use git2::{Commit, Error, ObjectType, Repository, ResetType};
 use lipsum::lipsum;
 
 pub fn make_initial_commit(repo: &Repository) {
@@ -47,6 +47,13 @@ pub fn commit_random_file<'a>(
             &[&head_commit],
         )
         .unwrap();
+
+    let object = repo
+        .find_object(commit_id, Some(ObjectType::Commit))
+        .unwrap();
+    let mut checkout = CheckoutBuilder::default();
+    repo.reset(&object, ResetType::Hard, Some(&mut checkout))
+        .unwrap();
     repo.find_commit(commit_id)
 }
 
@@ -61,7 +68,12 @@ pub fn checkout_new_branch<'a>(repo: &Repository, commit: &Commit<'a>, branch_na
     repo.checkout_head(Some(&mut checkout)).unwrap();
 }
 
-pub fn _status<P: AsRef<Path>>(path: P) {
+pub fn status<P: AsRef<Path>>(path: P, message: Option<&str>) {
+    message.into_iter().for_each(|m| println!("XXX {}", m));
+    Command::new("ls")
+        .current_dir(path.as_ref())
+        .status()
+        .unwrap();
     Command::new("git")
         .arg("status")
         .current_dir(path.as_ref())
