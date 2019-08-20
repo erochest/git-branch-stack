@@ -1,3 +1,5 @@
+use std::env::current_dir;
+
 use crate::errors::Result;
 use crate::stack::FileStack;
 
@@ -15,9 +17,9 @@ pub mod push;
 use Action::*;
 
 pub fn invoke_action(action: Action) -> Result<()> {
-    // TODO: look up the directory stack.
-    let repo = git2::Repository::open(".")?;
-    let mut stack = FileStack::new(&"./.git/BRANCH_STACK")?;
+    let cwd = current_dir()?;
+    let repo = git2::Repository::discover(&cwd)?;
+    let mut stack = FileStack::new(&repo.path().join("BRANCH_STACK"))?;
 
     match action {
         Push(ref branch_name) => push::push_branch(&repo, &mut stack, branch_name),
