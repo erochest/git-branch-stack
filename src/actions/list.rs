@@ -7,9 +7,9 @@ use crate::stack::FileStack;
 pub fn list_branch_stack(repo: &Repository, stack: &FileStack) -> Result<()> {
     let branch_name = get_current_branch_name(&repo)?;
 
-    print!("{}", branch_name);
+    println!("{}", branch_name);
     for branch_name in stack.iter() {
-        print!(" {}", branch_name);
+        println!("{}", branch_name);
     }
     println!();
 
