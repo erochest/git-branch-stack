@@ -74,7 +74,9 @@ impl IntoIterator for FileStack {
     type IntoIter = ::std::vec::IntoIter<Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter {
-        self.stack.clone().into_iter()
+        let mut stack = self.stack.clone();
+        stack.reverse();
+        stack.into_iter()
     }
 }
 
@@ -229,7 +231,7 @@ Trillian
         );
         let stack = FileStack::new(&stack_file.path()).unwrap();
         assert_that(&stack.into_iter().collect::<Vec<String>>()).is_equal_to(
-            &vec!["0", "1", "2", "3", "4", "5", "6"]
+            &vec!["6", "5", "4", "3", "2", "1", "0"]
                 .into_iter()
                 .map(String::from)
                 .collect::<Vec<String>>(),
