@@ -6,11 +6,13 @@ use clap::{
 use git_branch_stack::actions::{invoke_action, Action};
 use git_branch_stack::errors::{BranchStackError, Result};
 
+/// The main entry-point. Not really interesting.
 fn main() -> Result<()> {
     let action = parse_args()?;
     invoke_action(action)
 }
 
+/// Parse all of the command-line options into an `Action` that can be run.
 fn parse_args() -> Result<Action> {
     let arg_matches = app_from_crate!()
         .about("Maintain a stack of branches for easy navigation.")
@@ -42,6 +44,7 @@ fn parse_args() -> Result<Action> {
     }
 }
 
+/// Parse command-line arguments into parameters for the `push` command.
 fn parse_push_args<'a>(push_args: &ArgMatches<'a>) -> Result<Action> {
     push_args
         .value_of("branch")

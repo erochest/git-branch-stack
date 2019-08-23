@@ -1,3 +1,6 @@
+/// # Push command
+///
+/// This implements the `push` command.
 use git2::Repository;
 
 use crate::errors::Result;

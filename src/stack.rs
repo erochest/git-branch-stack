@@ -1,3 +1,40 @@
+/// # The File Stack
+///
+/// This is the core data type for the branch stack plugin. It's a stack
+/// of strings that is persisted to a file on disc.
+///
+/// ```
+/// # use tempfile::NamedTempFile;
+/// # use spectral::prelude::*;
+/// # use git_branch_stack::stack::FileStack;
+///
+/// let stack_file = NamedTempFile::new().unwrap();
+///
+/// {
+///     let mut stack = FileStack::new(&stack_file.path()).unwrap();
+///
+///     stack.push("a".to_string());
+///     stack.push("b".to_string());
+///     stack.push("c".to_string());
+///     assert_that(&stack.len()).is_equal_to(3);
+///     assert_that(&stack.iter().collect::<Vec<&String>>()).is_equal_to(
+///         &vec![&"c".to_string(), &"b".to_string(), &"a".to_string()]
+///     );
+///     assert_that(&stack.peek()).is_some().is_equal_to(&String::from("c"));
+///     assert_that(&stack.pop()).is_some().is_equal_to(&String::from("c"));
+///     assert_that(&stack.len()).is_equal_to(2);
+///     // stack goes out of scope and writes the stack here.
+/// }
+///
+/// {
+///     // Let's open the stack file again.
+///     let mut stack = FileStack::new(&stack_file.path()).unwrap();
+///
+///     assert_that(&stack.len()).is_equal_to(2);
+///     assert_that(&stack.pop()).is_some().is_equal_to(&String::from("b"));
+///     assert_that(&stack.pop()).is_some().is_equal_to(&String::from("a"));
+/// }
+/// ```
 use std::fs::File;
 use std::io::{Read, Write};
 use std::iter::{IntoIterator, Iterator};
@@ -5,6 +42,7 @@ use std::path::{Path, PathBuf};
 
 use crate::errors::Result;
 
+/// The core FileStack struct.
 #[derive(Debug)]
 pub struct FileStack {
     filename: PathBuf,
@@ -12,6 +50,8 @@ pub struct FileStack {
 }
 
 impl FileStack {
+    /// Creates a new FileStack given a file name. IO problems could raise
+    /// an error.
     pub fn new<P: AsRef<Path>>(filename: &P) -> Result<FileStack> {
         let stack = FileStack::read_file(&filename)?;
         Ok(FileStack {
@@ -20,22 +60,27 @@ impl FileStack {
         })
     }
 
+    /// The number of items in the stack.
     pub fn len(&self) -> usize {
         self.stack.len()
     }
 
+    /// Add an item to the top of the stack.
     pub fn push(&mut self, item: String) {
         self.stack.push(item);
     }
 
+    /// Remove an item from the top of the stack and return it.
     pub fn pop(&mut self) -> Option<String> {
         self.stack.pop()
     }
 
+    /// What's on top of the stack?
     pub fn peek(&self) -> Option<String> {
         self.stack.last().cloned()
     }
 
+    /// Iterate over all of the items in the stack from top down.
     pub fn iter(&self) -> impl Iterator<Item = &String> {
         self.stack.iter().rev()
     }

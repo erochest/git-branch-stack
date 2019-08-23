@@ -1,8 +1,16 @@
+/// # git Utilities
+///
+/// These are a set of higher-level functions for common operations.
 use git2::build::CheckoutBuilder;
 use git2::{BranchType, ObjectType, Repository, ResetType};
 
 use crate::errors::{BranchStackError, Result};
 
+/// This returns the name of the current branch. If the user's not on a named
+/// branch, this returns `Err(BranchStackError::NoCurrentBranch)`.
+///
+/// TODO: it may make more sense for this to return an `Option<String>` that
+/// is `None` if the user's not on a named branch.
 pub fn get_current_branch_name(repo: &Repository) -> Result<String> {
     let branch_name = repo
         .branches(Some(BranchType::Local))?
@@ -16,6 +24,10 @@ pub fn get_current_branch_name(repo: &Repository) -> Result<String> {
     Ok(branch_name)
 }
 
+/// Change to the branch named.
+///
+/// Currently this is implemented using `Repository.reset`. That's probably
+/// not right.
 pub fn change_branch(repo: &Repository, branch_name: &str) -> Result<()> {
     let branch = repo.find_branch(branch_name, BranchType::Local)?;
     let reference = branch.get();

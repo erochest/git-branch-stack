@@ -1,3 +1,6 @@
+/// # Pop Command
+///
+/// This implements the `pop` command.
 use git2::Repository;
 
 use crate::errors::{BranchStackError, Result};

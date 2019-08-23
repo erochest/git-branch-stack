@@ -1,3 +1,7 @@
+/// # List Command
+///
+/// This executes the `list` command. It prints the current branch name as
+/// well as the stack.
 use git2::Repository;
 
 use crate::errors::Result;
