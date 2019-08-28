@@ -48,7 +48,7 @@ fn test_pop() {
         .assert()
         .success()
         .stdout(predicate::str::contains(
-            "second-branch master third-branch\n",
+            "second-branch\nmaster\nthird-branch\n",
         ));
 
     Command::cargo_bin(env!("CARGO_PKG_NAME"))
@@ -64,7 +64,7 @@ fn test_pop() {
         .current_dir(&basedir.path())
         .assert()
         .success()
-        .stdout(predicate::str::contains("master third-branch\n"));
+        .stdout(predicate::str::contains("master\nthird-branch\n"));
 
     // assert that we are on `master`
     let branch = repo.find_branch("master", BranchType::Local).unwrap();

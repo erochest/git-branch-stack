@@ -48,6 +48,6 @@ fn test_list() {
         .assert()
         .success()
         .stdout(predicate::str::contains(
-            "second-branch master third-branch\n",
+            "second-branch\nmaster\nthird-branch\n",
         ));
 }
