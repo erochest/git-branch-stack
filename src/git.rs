@@ -2,7 +2,7 @@
 ///
 /// These are a set of higher-level functions for common operations.
 use git2::build::CheckoutBuilder;
-use git2::{BranchType, ObjectType, Repository, ResetType};
+use git2::{BranchType, ObjectType, Repository};
 
 use crate::errors::{BranchStackError, Result};
 
@@ -35,11 +35,11 @@ pub fn change_branch(repo: &Repository, branch_name: &str) -> Result<()> {
         .name()
         .ok_or_else(|| BranchStackError::InvalidBranchName(branch_name.to_string()))?;
 
-    repo.set_head(&refname)?;
-
     let object = reference.peel(ObjectType::Commit)?;
     let mut checkout = CheckoutBuilder::default();
-    repo.reset(&object, ResetType::Hard, Some(&mut checkout))?;
+    repo.checkout_tree(&object, Some(&mut checkout))?;
+
+    repo.set_head(&refname)?;
 
     Ok(())
 }
@@ -47,7 +47,7 @@ pub fn change_branch(repo: &Repository, branch_name: &str) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use std::fs::File;
-    use std::io::Write;
+    use std::io::{Read, Write};
     use std::path::Path;
 
     use git2::build::CheckoutBuilder;
@@ -93,6 +93,24 @@ mod tests {
         assert_that(&working_dir.path().join("file-3")).does_not_exist();
     }
 
+    #[test]
+    fn test_change_branch_does_not_reset_working_dir_changes() {
+        let (working_dir, repo) = setup_repo();
+        let filename = working_dir.path().join("file-2");
+
+        {
+            let mut file = File::create(&filename).unwrap();
+            writeln!(file, "not-random string").unwrap();
+        }
+
+        change_branch(&repo, "master").unwrap();
+
+        let mut file = File::open(&filename).unwrap();
+        let mut buffer = String::new();
+        file.read_to_string(&mut buffer).unwrap();
+        assert_that(&buffer).is_equal_to(&"not-random string\n".to_string());
+    }
+
     fn setup_repo() -> (TempDir, Repository) {
         let working_dir = tempdir().unwrap();
         let repo = Repository::init(working_dir.path()).unwrap();
@@ -108,10 +126,13 @@ mod tests {
         }
 
         {
+            // master commit 1 with file-1
             let commit =
                 commit_random_file(working_dir.path(), &repo, &sig, "file-1", "commit 1").unwrap();
+            // master commit 2 with file-2
             commit_random_file(working_dir.path(), &repo, &sig, "file-2", "commit 2").unwrap();
             checkout_new_branch(&repo, &commit, "branch-2");
+            // branch-2 off commit 1 with commit 3 with file-3
             commit_random_file(working_dir.path(), &repo, &sig, "file-3", "commit 3").unwrap();
         }
 
