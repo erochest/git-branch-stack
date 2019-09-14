@@ -1,7 +1,7 @@
 mod utils;
 
-use utils::*;
 use git_branch_stack::git::change_branch;
+use utils::*;
 
 use git2::Repository;
 use tempfile::tempdir;
