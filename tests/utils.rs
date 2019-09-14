@@ -3,9 +3,12 @@ use std::io::Write;
 use std::path::Path;
 use std::process::Command;
 
+use assert_cmd::assert::Assert;
+use assert_cmd::prelude::*;
 use git2::build::CheckoutBuilder;
-use git2::{Commit, Error, ObjectType, Repository, ResetType};
+use git2::{BranchType, Commit, Error, ObjectType, Repository, ResetType};
 use lipsum::lipsum;
+use spectral::prelude::*;
 
 pub fn make_initial_commit(repo: &Repository) {
     let author = repo.signature().unwrap();
@@ -79,4 +82,18 @@ pub fn _status<P: AsRef<Path>>(path: P, message: Option<&str>) {
         .current_dir(path.as_ref())
         .status()
         .unwrap();
+}
+
+pub fn command<P: AsRef<Path>>(path: P, args: &[&str]) -> Assert {
+    Command::cargo_bin(env!("CARGO_PKG_NAME"))
+        .unwrap()
+        .args(args)
+        .current_dir(path.as_ref())
+        .assert()
+        .success()
+}
+
+pub fn assert_branch(repo: &Repository, branch_name: &str) {
+    let branch = repo.find_branch(branch_name, BranchType::Local).unwrap();
+    assert_that(&branch.is_head()).is_true();
 }

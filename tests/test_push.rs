@@ -1,11 +1,8 @@
 mod utils;
 
-use std::process::Command;
-
 use utils::*;
 
-use assert_cmd::prelude::*;
-use git2::{BranchType, Repository};
+use git2::Repository;
 use spectral::prelude::*;
 use tempfile::tempdir;
 
@@ -22,15 +19,8 @@ fn test_push() {
     checkout_new_branch(&repo, &first_commit, "second-branch");
     commit_random_file(basedir.path(), &repo, "ipsum-ii", "second commit").unwrap();
 
-    Command::cargo_bin(env!("CARGO_PKG_NAME"))
-        .unwrap()
-        .args(&["push", "master"])
-        .current_dir(&basedir.path())
-        .assert()
-        .success();
+    command(&basedir, &["push", "master"]);
 
-    // assert that we are on `master`
-    let branch = repo.find_branch("master", BranchType::Local).unwrap();
-    assert_that(&branch.is_head()).is_true();
+    assert_branch(&repo, "master");
     assert_that(&basedir.path().join("ipsum-ii")).does_not_exist();
 }

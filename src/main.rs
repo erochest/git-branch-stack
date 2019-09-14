@@ -3,6 +3,7 @@ use clap::{
     SubCommand,
 };
 
+use git_branch_stack::actions::rotate::parse_rotation;
 use git_branch_stack::actions::{invoke_action, Action};
 use git_branch_stack::errors::{BranchStackError, Result};
 
@@ -21,7 +22,12 @@ fn parse_args() -> Result<Action> {
                 .about("Pushes a new branch onto tho stack.")
                 .arg(
                     Arg::with_name("branch")
-                        .help("The name of the branch to switch to.")
+                        .help(
+                            "The name of the branch to switch to. A number \
+                             like +1 or -1 rotates the stack until that \
+                             number (starting at 0, or counting from the \
+                             right for negative numbers) branch in on top.",
+                        )
                         .required(true)
                         .takes_value(true),
                 ),
@@ -48,6 +54,12 @@ fn parse_args() -> Result<Action> {
 fn parse_push_args<'a>(push_args: &ArgMatches<'a>) -> Result<Action> {
     push_args
         .value_of("branch")
-        .map(|branch_name| Action::Push(branch_name.to_string()))
+        .map(|branch_name| {
+            if let Some((dir, n)) = parse_rotation(branch_name) {
+                Action::Rotate(dir, n)
+            } else {
+                Action::Push(branch_name.to_string())
+            }
+        })
         .ok_or_else(|| BranchStackError::ArgError(String::from("branch")))
 }

@@ -15,7 +15,6 @@ pub fn list_branch_stack(repo: &Repository, stack: &FileStack) -> Result<()> {
     for branch_name in stack.iter() {
         println!("{}", branch_name);
     }
-    println!();
 
     Ok(())
 }

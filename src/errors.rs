@@ -28,6 +28,8 @@ pub enum BranchStackError {
     IoError(io::Error),
     /// Trying to pop off an empty stack.
     EmptyStack,
+    /// No such entry in the stack.
+    NoStackEntry,
 }
 
 /// An alias to make working with these errors easier.
@@ -45,6 +47,7 @@ impl fmt::Display for BranchStackError {
             NoCurrrentBranch => write!(f, "no current branch"),
             IoError(ref err) => err.fmt(f),
             EmptyStack => write!(f, "empty stack"),
+            NoStackEntry => write!(f, "no such entry in stack"),
         }
     }
 }
@@ -59,6 +62,7 @@ impl error::Error for BranchStackError {
             NoCurrrentBranch => "no current branch",
             IoError(ref err) => err.description(),
             EmptyStack => "empty stack",
+            NoStackEntry => "no such entry in stack",
         }
     }
 }

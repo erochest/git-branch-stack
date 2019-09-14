@@ -1,5 +1,6 @@
 use std::env::current_dir;
 
+use crate::actions::rotate::RotateDirection;
 use crate::errors::Result;
 use crate::stack::FileStack;
 
@@ -14,11 +15,14 @@ pub enum Action {
     List,
     /// Remove a branch from the stack and change into the nexi one down.
     Pop,
+    /// Take an item from the middle of the stack and rotate it to the top.
+    Rotate(RotateDirection, usize),
 }
 
 pub mod list;
 pub mod pop;
 pub mod push;
+pub mod rotate;
 
 use Action::*;
 
@@ -36,5 +40,6 @@ pub fn invoke_action(action: Action) -> Result<()> {
         Push(ref branch_name) => push::push_branch(&repo, &mut stack, branch_name),
         List => list::list_branch_stack(&repo, &stack),
         Pop => pop::pop_branch_stack(&repo, &mut stack),
+        Rotate(d, n) => rotate::rotate_branch(&repo, &mut stack, d, n),
     }
 }
