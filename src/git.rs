@@ -114,7 +114,7 @@ mod tests {
     fn setup_repo() -> (TempDir, Repository) {
         let working_dir = tempdir().unwrap();
         let repo = Repository::init(working_dir.path()).unwrap();
-        let sig = repo.signature().unwrap();
+        let sig = Signature::now("Zaphod Beeblebrox", "zbeebleb@heartofgold.ship").unwrap();
 
         {
             // initial commit

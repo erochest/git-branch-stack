@@ -6,7 +6,7 @@ use std::process::Command;
 use assert_cmd::assert::Assert;
 use assert_cmd::prelude::*;
 use git2::build::CheckoutBuilder;
-use git2::{BranchType, Commit, Error, ObjectType, Repository, ResetType};
+use git2::{BranchType, Commit, Error, ObjectType, Repository, ResetType, Signature};
 use lipsum::lipsum;
 use spectral::prelude::*;
 
@@ -25,7 +25,7 @@ pub fn commit_random_file<'a>(
     filename: &str,
     commit_message: &str,
 ) -> Result<Commit<'a>, Error> {
-    let author = repo.signature().unwrap();
+    let author = Signature::now("Trillian McMillan", "tmcmilla@heartofgold.ship").unwrap();
     let mut index = repo.index().unwrap();
     let head = repo.refname_to_id("HEAD").unwrap();
     let head_commit = repo.find_commit(head).unwrap();
