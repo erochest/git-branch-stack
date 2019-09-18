@@ -28,42 +28,17 @@ fn test_pop() {
     checkout_new_branch(&repo, &second_commit, "third-branch");
     commit_random_file(basepath, &repo, "ipsum-iii", "third commit").unwrap();
 
-    Command::cargo_bin(env!("CARGO_PKG_NAME"))
-        .unwrap()
-        .args(&["push", "master"])
-        .current_dir(&basedir.path())
-        .assert()
-        .success();
-    Command::cargo_bin(env!("CARGO_PKG_NAME"))
-        .unwrap()
-        .args(&["push", "second-branch"])
-        .current_dir(&basedir.path())
-        .assert()
-        .success();
+    command(basepath, &["push", "master"]);
+    command(basepath, &["push", "second-branch"]);
 
-    Command::cargo_bin(env!("CARGO_PKG_NAME"))
-        .unwrap()
-        .arg("list")
-        .current_dir(&basedir.path())
-        .assert()
-        .success()
+    command(basepath, &["list"])
         .stdout(predicate::str::contains(
             "second-branch\nmaster\nthird-branch\n",
         ));
 
-    Command::cargo_bin(env!("CARGO_PKG_NAME"))
-        .unwrap()
-        .arg("pop")
-        .current_dir(basepath)
-        .assert()
-        .success();
+    command(basepath, &["pop"]);
 
-    Command::cargo_bin(env!("CARGO_PKG_NAME"))
-        .unwrap()
-        .arg("list")
-        .current_dir(&basedir.path())
-        .assert()
-        .success()
+    command(basepath, &["list"])
         .stdout(predicate::str::contains("master\nthird-branch\n"));
 
     // assert that we are on `master`
@@ -71,4 +46,15 @@ fn test_pop() {
     assert_that(&branch.is_head()).is_true();
     assert_that(&basedir.path().join("ipsum-ii")).does_not_exist();
     assert_that(&basedir.path().join("ipsum-iii")).does_not_exist();
+
+    // pop master
+    command(basepath, &["pop"]);
+    // pop third-branch (empty stack)
+    Command::cargo_bin(env!("CARGO_PKG_NAME"))
+        .unwrap()
+        .arg("pop")
+        .current_dir(basepath)
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("EmptyStack"));
 }
