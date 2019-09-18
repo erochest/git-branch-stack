@@ -11,7 +11,7 @@ use lipsum::lipsum;
 use spectral::prelude::*;
 
 pub fn make_initial_commit(repo: &Repository) {
-    let author = repo.signature().unwrap();
+    let author = Signature::now("Trillian McMillan", "tmcmilla@heartofgold.ship").unwrap();
     let mut index = repo.index().unwrap();
     let oid = index.write_tree().unwrap();
     let tree = repo.find_tree(oid).unwrap();
