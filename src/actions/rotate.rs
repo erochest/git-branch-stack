@@ -19,12 +19,12 @@ pub fn rotate_branch(
     let current_branch = get_current_branch_name(repo)?;
     stack.push(current_branch);
 
-    eprintln!("pre-rotate: {:?}", stack);
+    // eprintln!("pre-rotate: {:?}", stack);
     match dir {
         RotateDirection::Up => stack.rotate_up(n)?,
         RotateDirection::Down => stack.rotate_down(n)?,
     }
-    eprintln!("post-rotate: {:?}", stack);
+    // eprintln!("post-rotate: {:?}", stack);
 
     let new_branch = stack.pop().ok_or(BranchStackError::NoStackEntry)?;
     println!("{}", new_branch);

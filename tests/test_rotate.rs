@@ -1,6 +1,6 @@
 mod utils;
 
-use git_branch_stack::git::change_branch;
+use git_branch_stack::git::{change_branch, get_current_branch_name};
 use utils::*;
 
 use git2::Repository;
@@ -40,4 +40,13 @@ fn test_rotate() {
     command(&basedir, &["push", "+1"]);
     assert_branch(&repo, "third-branch");
     command(&basedir, &["list"]).stdout("third-branch\nsecond-branch\nmaster\n");
+
+    // -1 raises bottom
+    command(&basedir, &["push", "--", "-1"]);
+    eprintln!(
+        "current branch: {:?}",
+        get_current_branch_name(&repo).unwrap()
+    );
+    assert_branch(&repo, "second-branch");
+    command(&basedir, &["list"]).stdout("second-branch\nmaster\nthird-branch\n");
 }
